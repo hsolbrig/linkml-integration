@@ -2,13 +2,16 @@
 name = "linkml-integration"
 version = "0.1.0"
 description = ""
-authors = ["hsolbrig <solbrig@jhu.edu>"]
+authors = ["hsolbrig <informatics@solbrigs.us>"]
 readme = "README.md"
 packages = [{include = "linkml_integration"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 linkml-runtime = "^1.3.7"
+
+inner-runtime = { path = "submodules/linkml-runtime", develop = true }
+inner-linkml = { path = "submodules/linkml", develop = true}
 
 
 [build-system]
