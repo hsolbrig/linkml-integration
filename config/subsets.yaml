@@ -1,0 +1,11 @@
+description: Subsets defined in this test harness
+
+subsets:
+  generator_tests: Tests of the linkml generators
+
+  loader_tests: Tests of the linkml-runtime loaders
+
+  dumper_tests: Tests of the linkml-runtime dumpers
+
+  help_tests: Tests that involve help file generation
+

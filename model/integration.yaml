@@ -1,0 +1,166 @@
+id: https://linkml.org/testing
+title: LinkML integration testing harness metadata
+name: integration
+description: |-
+  Testing harness for linkml integration testing
+license: https://creativecommons.org/publicdomain/zero/1.0/
+version: 0.1.0
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  test: https://linkml.org/testing/
+
+imports:
+  - linkml:types
+
+types:
+  Pythonpath:
+    typeof: string
+    description: A python style path
+
+  Unixpath:
+    typeof: string
+    description: A unix style path
+
+default_range: string
+
+classes:
+  Filepath:
+    description: a relative path to a file or directory
+    attributes:
+      path:
+        range: Unixpath
+        required: true
+      is_directory:
+        range: boolean
+        description: True means path is directory, false means file
+        ifabsent: False
+
+  # -------------------------
+  # Subsets
+  # -------------------------
+  Subset:
+    description: Categorization of type of test
+    attributes:
+      name:
+        range: string
+        identifier: true
+        description: name of specific subset
+      description:
+        range: string
+        description: Description of the particular subset
+
+
+  # -------------------------
+  # Comparators
+  # -------------------------
+  Comparator:
+    description: Output comparator
+    attributes:
+      name:
+        range: string
+        identifier: true
+      entry_point:
+        range: string
+        required: true
+        description: Comparator entry point
+        examples:
+          - value: utils.compare_rdf.compare_rdf
+      description:
+        range: string
+        description: comparator description
+
+  # -------------------------
+  # Modules
+  # -------------------------
+  Module:
+    description: LinkML software module to be tested
+    attributes:
+      name:
+        range: string
+        identifier: true
+        description: Unique module name
+      description:
+        range: string
+        description: Description of the module
+      entry_point:
+        range: Pythonpath
+        required: true
+        description: Module name and entry point
+        examples:
+          - value: YAMLLoader.load_any
+      comparator:
+        range: Comparator
+        description: Comparator to be used for the particular module's output
+        ifabsent: string("string_comparator")
+      subsets:
+        range: Subset
+        description: Subset(s) that this module belongs to
+        multivalued: True
+
+
+  # -------------------------
+  # Test Sets
+  # -------------------------
+  TestEntry:
+    description: A specific test to be executed in the context of a module
+    attributes:
+      source:
+        range: Filepath
+        description: source file or directory -- none if omitted
+      target:
+        range: Filepath
+        description: target file or directory
+        required: true
+      parameters:
+        range: string
+        description: generator parameter string
+      fail_text:
+        range: string
+        description: If present, string(s) that should be found in failure text
+        multivalued: true
+      subsets:
+        range: Subset
+        description: Subset(s) that this particular test belongs to. Can be used as a filter
+        multivalued: True
+
+  TestSet:
+    attributes:
+      module:
+        description: module to be tested
+        range: Module
+        required: true
+      tests:
+        description: collection of tests to be executed against the named module
+        range: TestEntry
+        multivalued: true
+
+  # ----------------------------
+  # A manifest
+  # ----------------------------
+  Manifest:
+    description: A collection of Subsets, modules, comparators, and/or a manifest
+    attributes:
+      description:
+        range: string
+        description: A description of the intent and purpose of a test set
+      subsets:
+        description: Subsets used in the model
+        range: Subset
+        inlined: true
+        multivalued: true
+      comparators:
+        description: Comparators that can be referenced in the model
+        range: Comparator
+        inlined: true
+        multivalued: true
+      modules:
+        description: Testing modules
+        range: Module
+        inlined: true
+        multivalued: true
+      tests:
+        description: Actual test sets
+        range: TestSet
+        inlined: true
+        multivalued: true

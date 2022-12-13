@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "linkml-integration"
+version = "0.1.0"
+description = ""
+authors = ["hsolbrig <solbrig@jhu.edu>"]
+readme = "README.md"
+packages = [{include = "linkml_integration"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+linkml-runtime = "^1.3.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

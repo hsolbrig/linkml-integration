@@ -1,0 +1,15 @@
+modules:
+
+  prefixtest:
+    target:
+      path: prefixtest.context.jsonld
+    source:
+      path: prefixtest.yaml
+    generator: jsonldcontextgen
+    parameters: mergeimports=true
+
+  helptests:
+    target:
+      path: generators/help/
+    parameters: --help
+
