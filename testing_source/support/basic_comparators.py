@@ -3,6 +3,20 @@ from typing import Optional
 from testing_source.support.compare_rdf import compare_rdf
 
 
+def string_comparator(expected: str, actual: str) -> Optional[str]:
+    """
+    Compare two strings w/ embedded line feeds.  Return a simple match/nomatch output message
+    :param expected: expected string
+    :param actual: actual string
+    :return: Error message if mismatch else None
+    """
+    if (
+            expected.replace("\r\n", "\n").strip()
+            != actual.replace("\r\n", "\n").strip()
+    ):
+        return f"Output {self.verb} changed."
+
+
 def jsonld_comparator(expected_data: str, actual_data: str) -> str:
     """Compare expected data in json-ld format to actual data in json-ld format"""
     return compare_rdf(expected_data, actual_data, "json-ld")
@@ -21,7 +35,7 @@ def rdf_comparator(
 
 
 def always_pass_comparator(
-    self, expected_data: str, new_data: str
+    expected_data: str, new_data: str
 ) -> Optional[str]:
     """
     No-op comparator -- everyone passes!

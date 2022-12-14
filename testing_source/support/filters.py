@@ -5,6 +5,9 @@ from json import dumps
 from jsonasobj2 import as_json, loads
 
 
+def identity_filter(s: str) -> str:
+    return s
+
 def ldcontext_metadata_filter(s: str) -> str:
     """
     Metafilter for jsonld context

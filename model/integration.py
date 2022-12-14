@@ -1,5 +1,5 @@
 # Auto generated from integration.yaml by pythongen.py version: 0.9.0
-# Generation date: 2022-12-12T20:11:22
+# Generation date: 2022-12-14T15:39:24
 # Schema: integration
 #
 # id: https://linkml.org/testing
@@ -64,7 +64,15 @@ class ComparatorName(extended_str):
     pass
 
 
+class FilterName(extended_str):
+    pass
+
+
 class ModuleName(extended_str):
+    pass
+
+
+class TestSetModule(ModuleName):
     pass
 
 
@@ -156,6 +164,39 @@ class Comparator(YAMLRoot):
 
 
 @dataclass
+class Filter(YAMLRoot):
+    """
+    Pre comparison filters
+    """
+    _inherited_slots: ClassVar[List[str]] = []
+
+    class_class_uri: ClassVar[URIRef] = TEST.Filter
+    class_class_curie: ClassVar[str] = "test:Filter"
+    class_name: ClassVar[str] = "Filter"
+    class_model_uri: ClassVar[URIRef] = TEST.Filter
+
+    name: Union[str, FilterName] = None
+    entry_point: str = None
+    description: Optional[str] = None
+
+    def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
+        if self._is_empty(self.name):
+            self.MissingRequiredField("name")
+        if not isinstance(self.name, FilterName):
+            self.name = FilterName(self.name)
+
+        if self._is_empty(self.entry_point):
+            self.MissingRequiredField("entry_point")
+        if not isinstance(self.entry_point, str):
+            self.entry_point = str(self.entry_point)
+
+        if self.description is not None and not isinstance(self.description, str):
+            self.description = str(self.description)
+
+        super().__post_init__(**kwargs)
+
+
+@dataclass
 class Module(YAMLRoot):
     """
     LinkML software module to be tested
@@ -170,8 +211,10 @@ class Module(YAMLRoot):
     name: Union[str, ModuleName] = None
     entry_point: Union[str, Pythonpath] = None
     description: Optional[str] = None
+    filter: Optional[Union[str, Pythonpath]] = "\"identity_filter\""
     comparator: Optional[Union[str, ComparatorName]] = "\"string_comparator\""
     subsets: Optional[Union[Union[str, SubsetName], List[Union[str, SubsetName]]]] = empty_list()
+    skip: Optional[Union[bool, Bool]] = False
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
         if self._is_empty(self.name):
@@ -187,12 +230,18 @@ class Module(YAMLRoot):
         if self.description is not None and not isinstance(self.description, str):
             self.description = str(self.description)
 
+        if self.filter is not None and not isinstance(self.filter, Pythonpath):
+            self.filter = Pythonpath(self.filter)
+
         if self.comparator is not None and not isinstance(self.comparator, ComparatorName):
             self.comparator = ComparatorName(self.comparator)
 
         if not isinstance(self.subsets, list):
             self.subsets = [self.subsets] if self.subsets is not None else []
         self.subsets = [v if isinstance(v, SubsetName) else SubsetName(v) for v in self.subsets]
+
+        if self.skip is not None and not isinstance(self.skip, Bool):
+            self.skip = Bool(self.skip)
 
         super().__post_init__(**kwargs)
 
@@ -210,10 +259,14 @@ class TestEntry(YAMLRoot):
     class_model_uri: ClassVar[URIRef] = TEST.TestEntry
 
     target: Union[dict, Filepath] = None
+    description: Optional[str] = None
+    issues: Optional[Union[str, List[str]]] = empty_list()
     source: Optional[Union[dict, Filepath]] = None
     parameters: Optional[str] = None
+    use_stdout: Optional[Union[bool, Bool]] = False
     fail_text: Optional[Union[str, List[str]]] = empty_list()
     subsets: Optional[Union[Union[str, SubsetName], List[Union[str, SubsetName]]]] = empty_list()
+    skip: Optional[Union[bool, Bool]] = False
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
         if self._is_empty(self.target):
@@ -221,11 +274,21 @@ class TestEntry(YAMLRoot):
         if not isinstance(self.target, Filepath):
             self.target = Filepath(**as_dict(self.target))
 
+        if self.description is not None and not isinstance(self.description, str):
+            self.description = str(self.description)
+
+        if not isinstance(self.issues, list):
+            self.issues = [self.issues] if self.issues is not None else []
+        self.issues = [v if isinstance(v, str) else str(v) for v in self.issues]
+
         if self.source is not None and not isinstance(self.source, Filepath):
             self.source = Filepath(**as_dict(self.source))
 
         if self.parameters is not None and not isinstance(self.parameters, str):
             self.parameters = str(self.parameters)
+
+        if self.use_stdout is not None and not isinstance(self.use_stdout, Bool):
+            self.use_stdout = Bool(self.use_stdout)
 
         if not isinstance(self.fail_text, list):
             self.fail_text = [self.fail_text] if self.fail_text is not None else []
@@ -234,6 +297,9 @@ class TestEntry(YAMLRoot):
         if not isinstance(self.subsets, list):
             self.subsets = [self.subsets] if self.subsets is not None else []
         self.subsets = [v if isinstance(v, SubsetName) else SubsetName(v) for v in self.subsets]
+
+        if self.skip is not None and not isinstance(self.skip, Bool):
+            self.skip = Bool(self.skip)
 
         super().__post_init__(**kwargs)
 
@@ -247,16 +313,18 @@ class TestSet(YAMLRoot):
     class_name: ClassVar[str] = "TestSet"
     class_model_uri: ClassVar[URIRef] = TEST.TestSet
 
-    module: Union[str, ModuleName] = None
+    module: Union[str, TestSetModule] = None
     tests: Optional[Union[Union[dict, TestEntry], List[Union[dict, TestEntry]]]] = empty_list()
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
         if self._is_empty(self.module):
             self.MissingRequiredField("module")
-        if not isinstance(self.module, ModuleName):
-            self.module = ModuleName(self.module)
+        if not isinstance(self.module, TestSetModule):
+            self.module = TestSetModule(self.module)
 
-        self._normalize_inlined_as_dict(slot_name="tests", slot_type=TestEntry, key_name="target", keyed=False)
+        if not isinstance(self.tests, list):
+            self.tests = [self.tests] if self.tests is not None else []
+        self.tests = [v if isinstance(v, TestEntry) else TestEntry(**as_dict(v)) for v in self.tests]
 
         super().__post_init__(**kwargs)
 
@@ -276,8 +344,9 @@ class Manifest(YAMLRoot):
     description: Optional[str] = None
     subsets: Optional[Union[Dict[Union[str, SubsetName], Union[dict, Subset]], List[Union[dict, Subset]]]] = empty_dict()
     comparators: Optional[Union[Dict[Union[str, ComparatorName], Union[dict, Comparator]], List[Union[dict, Comparator]]]] = empty_dict()
+    filters: Optional[Union[Dict[Union[str, FilterName], Union[dict, Filter]], List[Union[dict, Filter]]]] = empty_dict()
     modules: Optional[Union[Dict[Union[str, ModuleName], Union[dict, Module]], List[Union[dict, Module]]]] = empty_dict()
-    tests: Optional[Union[Union[dict, TestSet], List[Union[dict, TestSet]]]] = empty_list()
+    tests: Optional[Union[Dict[Union[str, TestSetModule], Union[dict, TestSet]], List[Union[dict, TestSet]]]] = empty_dict()
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
         if self.description is not None and not isinstance(self.description, str):
@@ -287,9 +356,11 @@ class Manifest(YAMLRoot):
 
         self._normalize_inlined_as_dict(slot_name="comparators", slot_type=Comparator, key_name="name", keyed=True)
 
+        self._normalize_inlined_as_dict(slot_name="filters", slot_type=Filter, key_name="name", keyed=True)
+
         self._normalize_inlined_as_dict(slot_name="modules", slot_type=Module, key_name="name", keyed=True)
 
-        self._normalize_inlined_as_dict(slot_name="tests", slot_type=TestSet, key_name="module", keyed=False)
+        self._normalize_inlined_as_dict(slot_name="tests", slot_type=TestSet, key_name="module", keyed=True)
 
         super().__post_init__(**kwargs)
 

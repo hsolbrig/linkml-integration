@@ -2,26 +2,32 @@ description: Comparators for use in this test harness
 
 comparators:
   string_comparator:
-    entry_point: comparators.string_comparator.string_comparator
+    entry_point: string_comparator
     description: Simple string comparison
 
   python_comparator:
-    entry_point: comparators.python_comparator.compare_python
+    entry_point: compare_python
     description: Python text comparator
 
   python_validator:
-    entry_point: comparators.python_comparator.validate_python
+    entry_point: validate_python
     description: Compare _and_ validate python output
 
   rdf_comparator:
-    entry_point: support.compare_rdf.compare_rdf
+    entry_point: compare_rdf
     description: compare RDF output. Note optional format parameter.
 
   jsonld_comparator:
-    entry_point: support.basic_comparators.jsonld_comparator
+    entry_point: jsonld_comparator
+
+  json_comparator:
+    entry_point: jsonld_comparator
 
   n3_comparator:
-    entry_point: support.basic_comparators.n3_comparator
+    entry_point: n3_comparator
 
   always_pass_comparator:
-    entry_point: support.basic_comparators.always_pass_comparator
+    entry_point: always_pass_comparator
+
+  identity_comparator:
+    entry_point: always_pass_comparator

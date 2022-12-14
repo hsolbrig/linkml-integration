@@ -86,13 +86,15 @@ modules:
     subsets: generator_tests
 
   jsonldcontextgen:
-    entry_point: ep
-    comparator: c
+    entry_point: "linkml.generators.jsonldcontextgen:cli"
+    comparator: jsonld_comparator
+    filter: ldcontext_metadata_filter
     subsets: generator_tests
 
-  jsonldgen:
-    entry_point: ep
-    comparator: c
+  jsongen:
+    entry_point: "linkml.generators.jsonldgen:cli"
+    comparator: json_comparator
+    filter: json_metadata_filter
     subsets: generator_tests
 
   jsonschemagen:
@@ -106,8 +108,9 @@ modules:
     subsets: generator_tests
 
   markdowngen:
-    entry_point: ep
-    comparator: c
+    skip: True
+    entry_point: "linkml.generators.markdowngen:cli"
+    comparator: directory_comparator
     subsets: generator_tests
 
   namespacegen:
@@ -121,13 +124,14 @@ modules:
     subsets: generator_tests
 
   owlgen:
-    entry_point: ep
-    comparator: c
+    entry_point: "linkml.generators.owlgen:cli"
+    comparator: rdf_comparator
     subsets: generator_tests
+    skip: true
 
   prefixmapgen:
-    entry_point: ep
-    comparator: c
+    entry_point: "linkml.generators.prefixmapgen:cli"
+    comparator: string_comparator
     subsets: generator_tests
 
   projectgen:
