@@ -1,0 +1,35 @@
+id: https://linkml.org/testing
+title: A rather simple k/value testing thingie
+name: testing
+license: https://creativecommons.org/publicdomain/zero/1.0/
+version: 0.1.0
+
+prefixes:
+  linkml: https://w3id.org/linkml/
+  test: https://linkml.org/testing/
+
+imports:
+  - linkml:types
+
+classes:
+  Kv:
+    attributes:
+      name:
+        identifier: true
+      value:
+      another_value:
+
+  Kvs:
+    attributes:
+      entry:
+        range: Kv
+        multivalued: true
+        inlined: true
+
+
+  Kvls:
+    attributes:
+      entry:
+        range: Kv
+        multivalued: true
+        inlined_as_list: true
