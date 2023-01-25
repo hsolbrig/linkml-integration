@@ -12,6 +12,7 @@ URI: [test:Filter](https://linkml.org/testing/Filter)
 ## Referenced by Class
 
  *  **None** *[➞filters](manifest__filters.md)*  <sub>0..\*</sub>  **[Filter](Filter.md)**
+ *  **None** *[➞filter](module__filter.md)*  <sub>0..1</sub>  **[Filter](Filter.md)**
 
 ## Attributes
 

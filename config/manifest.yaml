@@ -86,3 +86,10 @@ tests:
         parameters: --help
         use_stdout: True
 
+  markdowngen:
+    tests:
+      - target:
+          path: linkml_source/markdowndoc
+          is_directory: true
+        source:
+          path: linkml_source/meta.yaml

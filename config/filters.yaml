@@ -2,23 +2,23 @@ description: Filters for use in this test harness
 
 filters:
   identity_filter:
-    entry_point: identity_filter
-    description: Same as no filter
+    entry_point: harness_source.support.filters:identity_filter
+    description: Filter w/ no changes
   jupyter_notebook_filter:
-    entry_point: nb_filter
+    entry_point: harness_source.support.filters:nb_filter
     description: Filter for jupyter (ipynb) notebooks
   yaml_filter:
-    entry_point: yaml_filter
+    entry_point: harness_source.support.filters:yaml_filter
     description: Filter for generated yaml files
-  generic_metadata_filter:
-    entry_point: metadata_filter
+  generic_filter:
+    entry_point: harness_source.support.filters:metadata_filter
     description: Strip metadata from several types of output
-  json_metadata_context_filter:
-    entry_point: json_metadata_context_filter
+  json_context_filter:
+    entry_point: harness_source.support.filters:json_metadata_context_filter
     description: Filter for some json contexts
-  json_metadata_filter:
-    entry_point: json_metadata_filter
+  json_filter:
+    entry_point: harness_source.support.filters:json_metadata_filter
     description: filter for json output
-  ldcontext_metadata_filter:
-    entry_point: ldcontext_metadata_filter
+  ldcontext_filter:
+    entry_point: harness_source.support.filters:ldcontext_metadata_filter
     description: filter for json-ld context

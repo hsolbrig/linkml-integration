@@ -18,6 +18,9 @@ URI: [test:TestEntry](https://linkml.org/testing/TestEntry)
 
 ### Own
 
+ * [➞name](testEntry__name.md)  <sub>1..1</sub>
+     * Description: Name of the specific test.
+     * Range: [String](types/String.md)
  * [➞description](testEntry__description.md)  <sub>0..1</sub>
      * Description: Reason the test exists -- what it tests
      * Range: [String](types/String.md)

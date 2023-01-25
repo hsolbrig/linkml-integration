@@ -1,8 +1,17 @@
 id: https://linkml.org/testing
-title: LinkML integration testing harness metadata
+title: LinkML integration testing harness manifest model
 name: integration
 description: |-
-  Testing harness for linkml integration testing
+  Model for testing manifest for linkml integration.  
+  
+  This model allows the definition of:
+  * modules - major software modules to be tested.  This includes loaders, dumpers, generators and other misc tools
+  * subsets - arbitrary tags used for grouping and categorizing tests.  Tests cn be selectively run or omitted based
+              on subset membership
+  * comparators - functions that compare expected and actual outputs 
+  * filters - functions that can tweak expected and actual output to remove untested portions (dates, versions, etc.)
+  * test sets - collections of tests to be run against a specified module
+
 license: https://creativecommons.org/publicdomain/zero/1.0/
 version: 0.1.0
 
@@ -16,17 +25,19 @@ imports:
 types:
   Pythonpath:
     typeof: string
-    description: A python style path
+    description: A python style file path, including an optional entry point
+    examples:
+      - value: "linkml.generators.jsonldgen:cli"
 
   Unixpath:
     typeof: string
-    description: A unix style path
+    description: A unix style path. Usually relative in our situation.
 
 default_range: string
 
 classes:
   Filepath:
-    description: a relative path to a file or directory
+    description: A relative path to a file or directory.
     attributes:
       path:
         range: Unixpath
@@ -40,12 +51,12 @@ classes:
   # Subsets
   # -------------------------
   Subset:
-    description: Categorization of type of test
+    description: A tag used to categorize modules and tests
     attributes:
       name:
         range: string
         identifier: true
-        description: name of specific subset
+        description: Unique name of specific subset
       description:
         range: string
         description: Description of the particular subset
@@ -55,26 +66,30 @@ classes:
   # Comparators
   # -------------------------
   Comparator:
-    description: Output comparator
+    description: "Output comparator. Signature: comparator(expected: str, actual: str) -> Optional[str]"
     attributes:
       name:
         range: string
         identifier: true
+        description: Unique name of a specific comparator
       entry_point:
         range: string
         required: true
         description: Comparator entry point
         examples:
-          - value: utils.compare_rdf.compare_rdf
+          - value: utils.compare_rdf:compare_rdf
       description:
         range: string
-        description: comparator description
+        description: Description of comparator function and use
+      method:
+        readonly: The resolved method that actually gets called.
+        notes: We don't have a LinkML type for Callable, but the signature is Callable[[str, str], Optional[str]]
 
   # -------------------------
   # Filters
   # -------------------------
   Filter:
-    description: Pre comparison filters
+    description: "Pre comparison filters.  Signature: filter(txt: str) -> str"
     attributes:
       name:
         range: string
@@ -88,6 +103,31 @@ classes:
       description:
         range: string
         description: comparator description
+      method:
+        readonly: The resolved method that actually gets called.
+        notes: We don't have a LinkML type for Callable, but the signature is Callable[[str], str]
+
+  # -------------------------
+  # Validators
+  # -------------------------
+  Validator:
+    description: "Content validation. Signature: validator(txt: str) -> Optional[str]"
+    attributes:
+      name:
+        range: string
+        identifier: true
+      entry_point:
+        range: string
+        required: true
+        description: Filter entry point
+        examples:
+          - value: ldcontext_metadata_filter
+      description:
+        range: string
+        description: comparator description
+      method:
+        readonly: The resolved method that actually gets called.
+        notes: We don't have a LinkML type for Callable, but the signature is Callable[[str], str]
 
   # -------------------------
   # Modules
@@ -107,15 +147,21 @@ classes:
         required: true
         description: Module name and entry point
         examples:
-          - value: YAMLLoader.load_any
+          - value: linkml_runtime.loaders.YAMLLoader:load_any
+      entry_type:
+        range: ModuleCallers
+        required: true
+        description: type of module invocation (Loader, Dumper, Generator, etc.)
+      method:
+        readonly: The resolved entry_point that actually gets called.
       filter:
-        range: Pythonpath
+        range: Filter
         description: pre comparison filter to remove metadata, etc.
-        ifabsent: string("identity_filter")
+        ifabsent: string(identity_filter)
       comparator:
         range: Comparator
         description: Comparator to be used for the particular module's output
-        ifabsent: string("string_comparator")
+        ifabsent: string(string_comparator)
       subsets:
         range: Subset
         description: Subset(s) that this module belongs to
@@ -133,6 +179,10 @@ classes:
   TestEntry:
     description: A specific test to be executed in the context of a module
     attributes:
+      name:
+        range: string
+        description: Optional name of the specific test.
+        notes: Must be unique within the context of the module.  If absent, the target path will be used instead
       description:
         range: string
         description: Reason the test exists -- what it tests
@@ -166,6 +216,12 @@ classes:
         range: boolean
         description: Skip this test if true
         ifabsent: False
+      filter:
+        range: Filter
+        description: If present, override module level filter
+      comparator:
+        range: Comparator
+        description: If present, override module level comparator
 
   TestSet:
     attributes:
@@ -177,7 +233,7 @@ classes:
         description: collection of tests to be executed against the named module
         range: TestEntry
         multivalued: true
-        inlined_as_list: true
+        inlined: true
 
   # ----------------------------
   # A manifest
@@ -213,3 +269,11 @@ classes:
         range: TestSet
         inlined: true
         multivalued: true
+
+enums:
+  ModuleCallers:
+    description: Wrapper code for various modules
+    permissible_values:
+      Loader:
+      Dumper:
+      Generator:

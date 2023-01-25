@@ -8,8 +8,8 @@ packages = [{include = "testing_source"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-linkml-runtime = { path = "submodules/linkml-runtime", develop = false}
-linkml = { path = "submodules/linkml", develop = false}
+linkml-runtime = { path = "submodules/linkml-runtime", develop = true}
+linkml = { path = "submodules/linkml", develop = true}
 
 
 [build-system]

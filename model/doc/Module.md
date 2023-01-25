@@ -31,7 +31,7 @@ URI: [test:Module](https://linkml.org/testing/Module)
      * Example: YAMLLoader.load_any None
  * [➞filter](module__filter.md)  <sub>0..1</sub>
      * Description: pre comparison filter to remove metadata, etc.
-     * Range: [Pythonpath](types/Pythonpath.md)
+     * Range: [Filter](Filter.md)
  * [➞comparator](module__comparator.md)  <sub>0..1</sub>
      * Description: Comparator to be used for the particular module's output
      * Range: [Comparator](Comparator.md)

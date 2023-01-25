@@ -9,7 +9,7 @@ URI: [test:module__filter](https://linkml.org/testing/module__filter)
 
 ## Domain and Range
 
-None &#8594;  <sub>0..1</sub> [Pythonpath](types/Pythonpath.md)
+None &#8594;  <sub>0..1</sub> [Filter](Filter.md)
 
 ## Parents
 

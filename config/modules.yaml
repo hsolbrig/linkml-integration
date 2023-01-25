@@ -2,221 +2,226 @@ description: modules to be tested
 modules:
   csv_dumper:
     entry_point: ep
-    comparator: c
+    entry_type: Dumper
     subsets: dumper_tests
 
   json_dumper:
     entry_point: ep
-    comparator: c
+    entry_type: Dumper
     subsets: dumper_tests
 
   rdf_dumper:
     entry_point: ep
-    comparator: c
+    entry_type: Dumper
     subsets: dumper_tests
 
   rdflib_dumper:
     entry_point: ep
-    comparator: c
+    entry_type: Dumper
     subsets: dumper_tests
 
   yaml_dumper:
     entry_point: ep
-    comparator: c
+    entry_type: Dumper
     subsets: dumper_tests
 
   csv_loader:
     entry_point: ep
-    comparator: c
+    entry_type: Loader
     subsets: loader_tests
 
   json_loader:
     entry_point: ep
-    comparator: c
+    entry_type: Loader
     subsets: loader_tests
 
   rdf_loader:
     entry_point: ep
-    comparator: c
+    entry_type: Loader
     subsets: loader_tests
 
   rdflib_loader:
     entry_point: ep
-    comparator: c
+    entry_type: Loader
     subsets: loader_tests
 
   yaml_loader:
     entry_point: ep
-    comparator: c
+    entry_type: Loader
     subsets: loader_tests
 
   csvgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   docgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   dotgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   excelgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   golrgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   graphqlgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   javagen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   jsonldcontextgen:
     entry_point: "linkml.generators.jsonldcontextgen:cli"
+    entry_type: Generator
     comparator: jsonld_comparator
-    filter: ldcontext_metadata_filter
+    filter: ldcontext_filter
     subsets: generator_tests
 
   jsongen:
     entry_point: "linkml.generators.jsonldgen:cli"
+    entry_type: Generator
     comparator: json_comparator
-    filter: json_metadata_filter
+    filter: json_filter
     subsets: generator_tests
 
   jsonschemagen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   linkmlgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   markdowngen:
     skip: True
     entry_point: "linkml.generators.markdowngen:cli"
+    entry_type: Generator
     comparator: directory_comparator
     subsets: generator_tests
 
   namespacegen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   oocodegen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   owlgen:
     entry_point: "linkml.generators.owlgen:cli"
+    entry_type: Generator
     comparator: rdf_comparator
     subsets: generator_tests
     skip: true
 
   prefixmapgen:
     entry_point: "linkml.generators.prefixmapgen:cli"
+    entry_type: Generator
     comparator: string_comparator
     subsets: generator_tests
 
   projectgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   protogen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   pydanticgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   pythongen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   rdfgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   shaclgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   shexgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   sparqlgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   sqlalchemygen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   sqlddlgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   sqltablegen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   sssomgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   summarygen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   terminusdbgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   typescriptgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   yamlgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
   yumlgen:
     entry_point: ep
-    comparator: c
+    entry_type: Generator
     subsets: generator_tests
 
 

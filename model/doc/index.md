@@ -52,6 +52,7 @@ Testing harness for linkml integration testing
  * [➞description](testEntry__description.md) - Reason the test exists -- what it tests
  * [➞fail_text](testEntry__fail_text.md) - If present, string(s) that should be found in failure text
  * [➞issues](testEntry__issues.md) - Github issue(s) that the test addresses
+ * [➞name](testEntry__name.md) - Name of the specific test.
  * [➞parameters](testEntry__parameters.md) - generator parameter string
  * [➞skip](testEntry__skip.md) - Skip this test if true
  * [➞source](testEntry__source.md) - source file or directory -- none if omitted
