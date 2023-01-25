@@ -1,6 +1,6 @@
 [submodule "submodules/linkml-runtime"]
 	path = submodules/linkml-runtime
-	url = git@github.com:linkml/linkml-runtime.git
+	url = ../linkml-runtime.git
 [submodule "submodules/linkml"]
 	path = submodules/linkml
-	url = git@github.com:linkml/linkml.git
+	url = ../linkml.git

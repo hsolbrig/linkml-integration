@@ -1,0 +1,29 @@
+filters:
+  yaml_filter:
+    entry_point: harness_source.support.filters:yaml_filter
+    description: Filter for generated yaml files
+
+comparators:
+  python_comparator:
+    entry_point: harness_source.support.python_comparator:compare_python
+    description: Python text comparator
+
+subsets:
+  subset_c: A subset from the sub directory
+
+modules:
+  yaml_dumper:
+    entry_point: "linkml_runtime.dumpers.???"
+    entry_type: Dumper
+    subsets: subset_c
+
+tests:
+  yaml_loader:
+    - name: Inner Test
+      target:
+        path: t3
+      source:
+        path: s3
+  yaml_dumper:
+    - target:
+        path: t4

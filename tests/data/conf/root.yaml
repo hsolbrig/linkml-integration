@@ -1,0 +1,38 @@
+description: Harness loader test file
+
+filters:
+  identity_filter:
+    entry_point: harness_source.support.filters:identity_filter
+    description: Filter w/ no changes
+
+comparators:
+  string_comparator:
+    entry_point: harness_source.support.basic_comparators:string_comparator
+    description: Simple string comparison
+
+subsets:
+  subset_a: One subset
+  subset_b: Another subset
+
+modules:
+  yaml_loader:
+    entry_point: linkml_runtime.loaders.yaml_loader:load_any
+    entry_type: Loader
+    subsets: subset_a
+    filter: identity_filter
+    comparator: string_comparator
+    skip: true
+
+tests:
+  yaml_loader:
+    - name: First Test
+      target:
+        path: t1
+      source:
+        path: s1
+    - name: Second Test
+      target:
+        path: help
+      parameters: --help
+      use_stdout: True
+
