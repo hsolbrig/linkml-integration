@@ -2,12 +2,12 @@ description: Harness loader test file
 
 filters:
   identity_filter_e:
-    entry_point: harness_source.support.filters:identity_filter_e
+    entry_point: harness.support.filters:identity_filter_e
     description: Missing filter method
 
 comparators:
   string_comparator_e:
-    entry_point: harness_source.support.basic_comparatorsz:string_comparator
+    entry_point: harness.support.basic_comparatorsz:string_comparator
     description: Missing comparator module
 
 subsets:
@@ -17,6 +17,7 @@ subsets:
 modules:
   yaml_loader_e:
     entry_point: linkml_runtime.loaders.yaml_loader:load_anyz
+    entry_type: Loader
     subsets: subset_x
     filter: identity_filterx
     comparator: string_comparatorx

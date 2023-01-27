@@ -5,8 +5,8 @@ from contextlib import redirect_stdout
 from io import StringIO
 from typing import Optional
 
-from harness_source import OUTPUT_BASE
-from harness_source.support.filters import ldcontext_metadata_filter
+from harness import OUTPUT_BASE
+from harness.support.filters import ldcontext_metadata_filter
 
 
 def make_actual_directory(directory: str, clear: bool = False) -> None:

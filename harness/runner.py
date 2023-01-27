@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
-from harness_source.harness import Harness, empty_list, TEST_ID
-from harness_source.support.dirutils import make_actual_directory, make_expected_directory
+from harness.harness import Harness, empty_list, TEST_ID
+from harness.support.dirutils import make_actual_directory, make_expected_directory
 from model.python.integration import ModuleName, SubsetName, TestEntry
 
 

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "linkml-integration"
 version = "0.1.0"
-description = ""
+description = "Integration and testing module for LinkML"
 authors = ["hsolbrig <informatics@solbrigs.us>"]
 readme = "README.md"
 packages = [{include = "testing_source"}]

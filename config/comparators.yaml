@@ -2,28 +2,28 @@ description: Comparators for use in this test harness
 
 comparators:
   string_comparator:
-    entry_point: harness_source.support.basic_comparators:string_comparator
+    entry_point: harness.support.basic_comparators:string_comparator
     description: Simple string comparison
 
   python_comparator:
-    entry_point: harness_source.support.python_comparator:compare_python
+    entry_point: harness.support.python_comparator:compare_python
     description: Python text comparator
 
   rdf_comparator:
-    entry_point: harness_source.support.compare_rdf:compare_rdf
+    entry_point: harness.support.compare_rdf:compare_rdf
     description: compare RDF output. Note optional format parameter.
 
   jsonld_comparator:
-    entry_point: harness_source.support.basic_comparators:jsonld_comparator
+    entry_point: harness.support.basic_comparators:jsonld_comparator
 
   json_comparator:
-    entry_point: harness_source.support.basic_comparators:jsonld_comparator
+    entry_point: harness.support.basic_comparators:jsonld_comparator
 
   n3_comparator:
-    entry_point: harness_source.support.basic_comparators:n3_comparator
+    entry_point: harness.support.basic_comparators:n3_comparator
 
   always_pass_comparator:
-    entry_point: harness_source.support.basic_comparators:always_pass_comparator
+    entry_point: harness.support.basic_comparators:always_pass_comparator
 
   directory_comparator:
-    entry_point: harness_source.support.dirutils.directory_comparator
+    entry_point: harness.support.dirutils.directory_comparator

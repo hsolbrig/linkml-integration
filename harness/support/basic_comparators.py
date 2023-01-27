@@ -1,6 +1,6 @@
 from typing import Optional
 
-from harness_source.support.compare_rdf import compare_rdf
+from harness.support.compare_rdf import compare_rdf
 
 
 def string_comparator(expected: str, actual: str) -> Optional[str]:

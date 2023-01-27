@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
 from model.integration import Module, TestEntry, ModuleName
-from harness_source import BASE_DIR
+from harness import BASE_DIR
 
 
 class RunLog:

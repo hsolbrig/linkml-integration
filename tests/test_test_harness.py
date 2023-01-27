@@ -2,8 +2,8 @@ import os
 import unittest
 from typing import List, Optional
 
-from harness_source.harness import Harness
-from harness_source import CONFIG_PATH
+from harness.harness import Harness
+from harness import CONFIG_PATH
 from tests import DATA_DIR
 
 
@@ -48,10 +48,11 @@ class HarnessTestCase(unittest.TestCase):
         h = Harness(os.path.join(DATA_DIR, 'conf_w_errors', 'bad_references'))
         self._check_messages(h,
                              ["Module yaml_loader_e: Unrecognized subset: subset_x"],
-                             ["Unrecognized entry point: harness_source.support.basic_comparatorsz:string_comparator",
-                              "Unrecognized method: identity_filter_e in entry_point: harness_source.support.filters:identity_filter_e",
+                             ["Unrecognized entry point: harness.support.basic_comparatorsz:string_comparator",
+                              "Unrecognized method: identity_filter_e in entry_point: harness.support.filters:identity_filter_e",
                               "Module yaml_loader_e: Unrecognized comparator: string_comparatorx",
-                              "Module yaml_loader_e: Unrecognized filter: string_comparatorx",
+                              "Module yaml_loader_e: Unrecognized filter: identity_filterx",
+                              "Unrecognized method: load_anyz in entry_point: linkml_runtime.loaders.yaml_loader:load_anyz",
                               "Testing module yaml_loader is not defined"])
 
     def test_real_config_file(self):

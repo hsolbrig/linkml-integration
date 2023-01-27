@@ -1,11 +1,11 @@
 filters:
   yaml_filter:
-    entry_point: harness_source.support.filters:yaml_filter
+    entry_point: harness.support.filters:yaml_filter
     description: Filter for generated yaml files
 
 comparators:
   python_comparator:
-    entry_point: harness_source.support.python_comparator:compare_python
+    entry_point: harness.support.python_comparator:compare_python
     description: Python text comparator
 
 subsets:
@@ -13,7 +13,7 @@ subsets:
 
 modules:
   yaml_dumper:
-    entry_point: "linkml_runtime.dumpers.???"
+    entry_point: "linkml_runtime.dumpers.yaml_dumper:YAMLDumper"
     entry_type: Dumper
     subsets: subset_c
 
