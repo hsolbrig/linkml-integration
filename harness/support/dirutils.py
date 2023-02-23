@@ -3,75 +3,38 @@ import os
 import shutil
 from contextlib import redirect_stdout
 from io import StringIO
-from typing import Optional
+from typing import Optional, Union, List
 
-from harness import OUTPUT_BASE
 from harness.support.filters import ldcontext_metadata_filter
 
 
-def make_actual_directory(directory: str, clear: bool = False) -> None:
+def make_guarded_directory(base: str, dir_path: Union[str, List[str]], *, clear: bool = False) -> None:
     """
-    Create directory if necessary and clear it if requested
-    :param directory: Directory to create
-    :param clear: True means remove everything there
+    Create a nested set of directories relative to base adding guard files as needed
+    :param base: base directory - directory is built relative to this
+    :param dir_path: subdirectory path(s) relative to the base
+    :param clear: True means clear everything except the guard files in the leaf directory
     """
-    if clear or not os.path.exists(directory):
-        safety_file = os.path.join(directory, "generated")
-        if os.path.exists(directory):
-            if not os.path.exists(safety_file):
-                raise FileNotFoundError(
-                    f"'generated' guard file not found in {directory}"
-                )
-            shutil.rmtree(directory)
-        os.makedirs(directory, exist_ok=True)
-        with open(safety_file, "w") as f:
-            f.write(
-                "Generated for safety.  Directory will not be cleared if this file is not present"
-            )
-
-
-def make_expected_directory(fname: str, is_directory: bool) -> None:
-    """
-    Make a directory for fname
-    :param fname: File name to make the directory for
-    :param is_directory: True means fname is a directory name, false, a file name
-    """
-    if not is_directory:
-        make_expected_directory(os.path.dirname(fname), True)
-    else:
-        if not os.path.relpath(fname, OUTPUT_BASE).startswith('.'):
-            make_expected_directory(os.path.dirname(fname), True)
-            make_actual_directory(fname)
-
-
-def make_and_clear_directory(dirbase: str) -> None:
-    """Make dirbase if necessary and then clear generated files"""
-    import shutil
-
-    safety_file = os.path.join(dirbase, "generated")
-    if os.path.exists(dirbase):
+    def make_safety_file() -> None:
+        os.makedirs(abs_dir, exist_ok=True)
         if not os.path.exists(safety_file):
-            raise FileNotFoundError(
-                "'generated' guard file not found in {}".format(safety_file)
-            )
-        shutil.rmtree(dirbase)
-    os.makedirs(dirbase)
-    with open(os.path.join(dirbase, "generated"), "w") as f:
-        f.write(
-            "Generated for safety.  Directory will not be cleared if this file is not present"
-        )
+            with open(safety_file, "w") as f:
+                f.write("Generated for safety.  Directory will not be cleared if this file is not present")
 
+    # iterate downwards creating and/or clearing subdirectories
+    if not dir_path:
+        raise ValueError("dir_path cannot be empty")
+    dir_path = dir_path if isinstance(dir_path, str) else os.path.join(*dir_path)
+    if os.path.isabs(dir_path):
+        raise ValueError("dir_path must be relative to the base")
 
-def file_text(txt_or_fname: str) -> str:
-    """
-    Determine whether text_or_fname is a file name or a string and, if a file name, read it
-    :param text_or_fname:
-    :return:
-    """
-    if len(txt_or_fname) > 4 and "\n" not in txt_or_fname:
-        with open(txt_or_fname) as ef:
-            return ef.read()
-    return txt_or_fname
+    abs_dir = os.path.join(base, dir_path)
+    safety_file = os.path.join(abs_dir, "safety")
+    if clear and os.path.exists(abs_dir):
+        if not os.path.exists(safety_file):
+            raise FileNotFoundError(f"safety guard file not found in {dir_path}")
+        shutil.rmtree(abs_dir)
+    make_safety_file()
 
 
 class dircmp(filecmp.dircmp):

@@ -27,7 +27,7 @@ types:
     typeof: string
     description: A python style file path, including an optional entry point
     examples:
-      - value: "linkml.generators.jsonldgen:cli"
+      - value: linkml.generators.jsonldgen:cli"
 
   Unixpath:
     typeof: string
@@ -44,7 +44,7 @@ classes:
         required: true
       is_directory:
         range: boolean
-        description: True means path is directory, false means file
+        description: True means that the path describes a directory, false a file
         ifabsent: False
 
   # -------------------------
@@ -66,7 +66,9 @@ classes:
   # Comparators
   # -------------------------
   Comparator:
-    description: "Output comparator. Signature: comparator(expected: str, actual: str) -> Optional[str]"
+    description: |-
+      Output comparator. Signature: comparator(expected: str, actual: str) -> Optional[str]
+      An empty / null return indicates success. Non-compare returns a description of the difference
     attributes:
       name:
         range: string
@@ -82,14 +84,18 @@ classes:
         range: string
         description: Description of comparator function and use
       method:
-        readonly: The resolved method that actually gets called.
+        readonly: The resolved method that actually gets called.  Filled in by the loader.
         notes: We don't have a LinkML type for Callable, but the signature is Callable[[str, str], Optional[str]]
 
   # -------------------------
   # Filters
   # -------------------------
   Filter:
-    description: "Pre comparison filters.  Signature: filter(txt: str) -> str"
+    description: |-
+      Both newly generated output and existing data are run through this filter before comparison.
+      In addition, existing data is run through this filter before being written.  The primary purpose
+      of the filter is to remove location and temporal metadata from the output files.
+      Signature: filter(txt: str) -> str
     attributes:
       name:
         range: string
@@ -111,7 +117,9 @@ classes:
   # Validators
   # -------------------------
   Validator:
-    description: "Content validation. Signature: validator(txt: str) -> Optional[str]"
+    description: |-
+      Content validation. Used to determine whether the output parses in the target language
+      Signature: validator(txt: str) -> Optional[str]"
     attributes:
       name:
         range: string
@@ -133,7 +141,9 @@ classes:
   # Modules
   # -------------------------
   Module:
-    description: LinkML software module to be tested
+    description: |-
+      The formal description of a LinkML software module to be tested.  Each module is referenced in the
+      TestSet, accompanied by the set of tests that are run against it
     attributes:
       name:
         range: string
@@ -153,7 +163,7 @@ classes:
         required: true
         description: type of module invocation (Loader, Dumper, Generator, etc.)
       method:
-        readonly: The resolved entry_point that actually gets called.
+        readonly: The resolved entry_point that actually gets called.  Filled in by the loader
       filter:
         range: Filter
         description: pre comparison filter to remove metadata, etc.
@@ -233,7 +243,7 @@ classes:
         description: collection of tests to be executed against the named module
         range: TestEntry
         multivalued: true
-        inlined: true
+        inlined_as_list: true
 
   # ----------------------------
   # A manifest

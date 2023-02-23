@@ -1,226 +1,232 @@
 description: modules to be tested
 modules:
   csv_dumper:
-    entry_point: ep
+    entry_point: linkml_runtime.dumpers.csv_dumper:CSVDumper
     entry_type: Dumper
     subsets: dumper_tests
 
   json_dumper:
-    entry_point: ep
+    entry_point: linkml_runtime.dumpers.json_dumper:JSONDumper
     entry_type: Dumper
     subsets: dumper_tests
 
   rdf_dumper:
-    entry_point: ep
+    entry_point: linkml_runtime.dumpers.rdf_dumper:RDFDumper
     entry_type: Dumper
     subsets: dumper_tests
 
   rdflib_dumper:
-    entry_point: ep
+    entry_point: linkml_runtime.dumpers.rdflib_dumper:RDFLibDumper
     entry_type: Dumper
     subsets: dumper_tests
 
   yaml_dumper:
-    entry_point: ep
+    entry_point: linkml_runtime.dumpers.yaml_dumper:YAMLDumper
     entry_type: Dumper
     subsets: dumper_tests
 
   csv_loader:
-    entry_point: ep
+    entry_point: linkml_runtime.loaders.csv_loader:CSVLoader
     entry_type: Loader
     subsets: loader_tests
 
   json_loader:
-    entry_point: ep
+    entry_point: linkml_runtime.loaders.json_loader:JSONLoader
     entry_type: Loader
     subsets: loader_tests
 
   rdf_loader:
-    entry_point: ep
+    entry_point: linkml_runtime.loaders.rdf_loader:RDFLoader
     entry_type: Loader
     subsets: loader_tests
 
   rdflib_loader:
-    entry_point: ep
+    entry_point: linkml_runtime.loaders.rdflib_loader:RDFLibLoader
     entry_type: Loader
     subsets: loader_tests
 
   yaml_loader:
-    entry_point: ep
+    entry_point: linkml_runtime.loaders.yaml_loader:YAMLLoader
     entry_type: Loader
     subsets: loader_tests
 
   csvgen:
-    entry_point: ep
+    entry_point: linkml.generators.csvgen:CsvGenerator
     entry_type: Generator
     subsets: generator_tests
 
   docgen:
-    entry_point: ep
+    entry_point: linkml.generators.docgen:DocGenerator
     entry_type: Generator
     subsets: generator_tests
 
   dotgen:
-    entry_point: ep
+    entry_point: linkml.generators.dotgen:DotGenerator
+    entry_type: Generator
+    subsets: generator_tests
+
+  erdiagramgen:
+    entry_point: linkml.generators.erdiagramgen:ERDiagramGenerator
     entry_type: Generator
     subsets: generator_tests
 
   excelgen:
-    entry_point: ep
+    entry_point: linkml.generators.excelgen:ExcelGenerator
     entry_type: Generator
     subsets: generator_tests
 
   golrgen:
-    entry_point: ep
+    entry_point: linkml.generators.golrgen:GolrSchemaGenerator
     entry_type: Generator
     subsets: generator_tests
 
   graphqlgen:
-    entry_point: ep
+    entry_point: linkml.generators.graphqlgen:GraphqlGenerator
     entry_type: Generator
     subsets: generator_tests
 
   javagen:
-    entry_point: ep
+    entry_point: linkml.generators.javagen:JavaGenerator
     entry_type: Generator
     subsets: generator_tests
 
   jsonldcontextgen:
-    entry_point: "linkml.generators.jsonldcontextgen:cli"
+    entry_point: linkml.generators.jsonldcontextgen:ContextGenerator
     entry_type: Generator
     comparator: jsonld_comparator
     filter: ldcontext_filter
     subsets: generator_tests
 
   jsongen:
-    entry_point: "linkml.generators.jsonldgen:cli"
+    entry_point: linkml.generators.jsonldgen:JSONLDGenerator
     entry_type: Generator
     comparator: json_comparator
     filter: json_filter
     subsets: generator_tests
 
   jsonschemagen:
-    entry_point: ep
+    entry_point: linkml.generators.jsonschemagen:JsonSchemaGenerator
     entry_type: Generator
     subsets: generator_tests
 
   linkmlgen:
-    entry_point: ep
+    entry_point: linkml.generators.linkmlgen:LinkmlGenerator
     entry_type: Generator
     subsets: generator_tests
 
   markdowngen:
     skip: True
-    entry_point: "linkml.generators.markdowngen:cli"
+    entry_point: linkml.generators.markdowngen:MarkdownGenerator
     entry_type: Generator
     comparator: directory_comparator
     subsets: generator_tests
 
   namespacegen:
-    entry_point: ep
+    entry_point: linkml.generators.namespacegen:NamespaceGenerator
     entry_type: Generator
     subsets: generator_tests
 
   oocodegen:
-    entry_point: ep
+    entry_point: linkml.generators.oocodegen:OOCodeGenerator
     entry_type: Generator
     subsets: generator_tests
 
   owlgen:
-    entry_point: "linkml.generators.owlgen:cli"
+    entry_point: linkml.generators.owlgen:OwlSchemaGenerator
     entry_type: Generator
     comparator: rdf_comparator
     subsets: generator_tests
     skip: true
 
   prefixmapgen:
-    entry_point: "linkml.generators.prefixmapgen:cli"
+    entry_point: linkml.generators.prefixmapgen:PrefixGenerator
     entry_type: Generator
     comparator: string_comparator
     subsets: generator_tests
 
   projectgen:
-    entry_point: ep
+    entry_point: linkml.generators.projectgen:ProjectGenerator
     entry_type: Generator
     subsets: generator_tests
 
   protogen:
-    entry_point: ep
+    entry_point: linkml.generators.protogen:ProtoGenerator
     entry_type: Generator
     subsets: generator_tests
 
   pydanticgen:
-    entry_point: ep
+    entry_point: linkml.generators.pydanticgen:PydanticGenerator
     entry_type: Generator
     subsets: generator_tests
 
   pythongen:
-    entry_point: ep
+    entry_point: linkml.generators.pythongen:PythonGenerator
     entry_type: Generator
     subsets: generator_tests
 
   rdfgen:
-    entry_point: ep
+    entry_point: linkml.generators.rdfgen:RDFGenerator
     entry_type: Generator
     subsets: generator_tests
 
   shaclgen:
-    entry_point: ep
+    entry_point: linkml.generators.shaclgen:ShaclGenerator
     entry_type: Generator
     subsets: generator_tests
 
   shexgen:
-    entry_point: ep
+    entry_point: linkml.generators.shexgen:ShExGenerator
     entry_type: Generator
     subsets: generator_tests
 
   sparqlgen:
-    entry_point: ep
+    entry_point: linkml.generators.sparqlgen:SparqlGenerator
     entry_type: Generator
     subsets: generator_tests
 
   sqlalchemygen:
-    entry_point: ep
+    entry_point: linkml.generators.sqlalchemygen:SQLAlchemyGenerator
     entry_type: Generator
     subsets: generator_tests
 
   sqlddlgen:
-    entry_point: ep
+    entry_point: linkml.generators.sqlddlgen:SQLDDLGenerator
     entry_type: Generator
     subsets: generator_tests
 
   sqltablegen:
-    entry_point: ep
+    entry_point: linkml.generators.sqltablegen:SQLTableGenerator
     entry_type: Generator
     subsets: generator_tests
 
   sssomgen:
-    entry_point: ep
+    entry_point: linkml.generators.sssomgen:SSSOMGenerator
     entry_type: Generator
     subsets: generator_tests
 
   summarygen:
-    entry_point: ep
+    entry_point: linkml.generators.summarygen:SummaryGenerator
     entry_type: Generator
     subsets: generator_tests
 
-  terminusdbgen:
-    entry_point: ep
-    entry_type: Generator
-    subsets: generator_tests
+# Re-add this whenever linkml issue #1271 is resolved
+#  terminusdbgen:
+#    entry_point: linkml.generators.terminusdbgen:TerminusdbGenerator
+#    entry_type: Generator
+#    subsets: generator_tests
 
   typescriptgen:
-    entry_point: ep
+    entry_point: linkml.generators.typescriptgen:TypescriptGenerator
     entry_type: Generator
     subsets: generator_tests
 
   yamlgen:
-    entry_point: ep
+    entry_point: linkml.generators.yamlgen:YAMLGenerator
     entry_type: Generator
     subsets: generator_tests
 
   yumlgen:
-    entry_point: ep
+    entry_point: linkml.generators.yumlgen:YumlGenerator
     entry_type: Generator
     subsets: generator_tests
 

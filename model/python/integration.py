@@ -1,5 +1,5 @@
 # Auto generated from integration.yaml by pythongen.py version: 0.9.0
-# Generation date: 2023-01-25T16:24:19
+# Generation date: 2023-02-21T12:00:25
 # Schema: integration
 #
 # id: https://linkml.org/testing
@@ -129,6 +129,11 @@ class Subset(YAMLRoot):
     description: Optional[str] = None
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
+        if self.name is None and len(kwargs) == 1:
+            for k in kwargs:
+                self.name = k
+                self.description = kwargs[k]
+                kwargs = {}
         if self._is_empty(self.name):
             self.MissingRequiredField("name")
         if not isinstance(self.name, SubsetName):
@@ -144,6 +149,7 @@ class Subset(YAMLRoot):
 class Comparator(YAMLRoot):
     """
     Output comparator. Signature: comparator(expected: str, actual: str) -> Optional[str]
+    An empty / null return indicates success. Non-compare returns a description of the difference
     """
     _inherited_slots: ClassVar[List[str]] = []
 
@@ -180,7 +186,10 @@ class Comparator(YAMLRoot):
 @dataclass
 class Filter(YAMLRoot):
     """
-    Pre comparison filters.  Signature: filter(txt: str) -> str
+    Both newly generated output and existing data are run through this filter before comparison.
+    In addition, existing data is run through this filter before being written.  The primary purpose
+    of the filter is to remove location and temporal metadata from the output files.
+    Signature: filter(txt: str) -> str
     """
     _inherited_slots: ClassVar[List[str]] = []
 
@@ -217,7 +226,8 @@ class Filter(YAMLRoot):
 @dataclass
 class Validator(YAMLRoot):
     """
-    Content validation. Signature: validator(txt: str) -> Optional[str]
+    Content validation. Used to determine whether the output parses in the target language
+    Signature: validator(txt: str) -> Optional[str]"
     """
     _inherited_slots: ClassVar[List[str]] = []
 
@@ -254,7 +264,8 @@ class Validator(YAMLRoot):
 @dataclass
 class Module(YAMLRoot):
     """
-    LinkML software module to be tested
+    The formal description of a LinkML software module to be tested.  Each module is referenced in the
+    TestSet, accompanied by the set of tests that are run against it
     """
     _inherited_slots: ClassVar[List[str]] = []
 
@@ -340,7 +351,7 @@ class TestEntry(YAMLRoot):
         if self._is_empty(self.target):
             self.MissingRequiredField("target")
         if not isinstance(self.target, Filepath):
-            self.target = Filepath(**as_dict(self.target))
+            self.target = self._normalize_assignment(self.target, Filepath)
 
         if self.name is not None and not isinstance(self.name, str):
             self.name = str(self.name)
@@ -353,7 +364,7 @@ class TestEntry(YAMLRoot):
         self.issues = [v if isinstance(v, str) else str(v) for v in self.issues]
 
         if self.source is not None and not isinstance(self.source, Filepath):
-            self.source = Filepath(**as_dict(self.source))
+            self.source = self._normalize_assignment(self.source, Filepath)
 
         if self.parameters is not None and not isinstance(self.parameters, str):
             self.parameters = str(self.parameters)
@@ -394,15 +405,19 @@ class TestSet(YAMLRoot):
     tests: Optional[Union[Union[dict, TestEntry], List[Union[dict, TestEntry]]]] = empty_list()
 
     def __post_init__(self, *_: List[str], **kwargs: Dict[str, Any]):
+        if self.module is None and len(kwargs) == 1:
+            for k in kwargs:
+                self.module = k
+                self.tests = kwargs[k]
+                kwargs = {}
         if self._is_empty(self.module):
             self.MissingRequiredField("module")
         if not isinstance(self.module, TestSetModule):
             self.module = TestSetModule(self.module)
 
-        # self._normalize_inlined_slot(self, slot_name: str, slot_type: Type, key_name: Optional[str],
-        #                         inlined_as_list: Optional[bool], keyed: bool)
-        self._normalize_inlined_slot(slot_name="tests", slot_type=TestEntry, keyed=False)
-        # self._normalize_inlined_as_list(slot_name="tests", slot_type=TestEntry, keyed=False)
+        if not isinstance(self.tests, list):
+            self.tests = [self.tests] if self.tests is not None else []
+        self.tests = [v if isinstance(v, TestEntry) else self._normalize_assignment(v, TestEntry) for v in self.tests]
 
         super().__post_init__(**kwargs)
 
@@ -430,14 +445,29 @@ class Manifest(YAMLRoot):
         if self.description is not None and not isinstance(self.description, str):
             self.description = str(self.description)
 
+        if not self.subsets and kwargs:
+            self.subsets = kwargs
+            kwargs = {}
         self._normalize_inlined_as_dict(slot_name="subsets", slot_type=Subset, key_name="name", keyed=True)
 
+        if not self.comparators and kwargs:
+            self.comparators = kwargs
+            kwargs = {}
         self._normalize_inlined_as_dict(slot_name="comparators", slot_type=Comparator, key_name="name", keyed=True)
 
+        if not self.filters and kwargs:
+            self.filters = kwargs
+            kwargs = {}
         self._normalize_inlined_as_dict(slot_name="filters", slot_type=Filter, key_name="name", keyed=True)
 
+        if not self.modules and kwargs:
+            self.modules = kwargs
+            kwargs = {}
         self._normalize_inlined_as_dict(slot_name="modules", slot_type=Module, key_name="name", keyed=True)
 
+        if not self.tests and kwargs:
+            self.tests = kwargs
+            kwargs = {}
         self._normalize_inlined_as_dict(slot_name="tests", slot_type=TestSet, key_name="module", keyed=True)
 
         super().__post_init__(**kwargs)

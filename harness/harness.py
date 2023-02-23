@@ -45,7 +45,7 @@ class Harness:
     def __post_init__(self) -> None:
         # Recursively process the manifest configuration files
         self.proc_config_dir(self.config_root_dir)
-        self.validate_model()
+        self._validate_model()
 
     # TODO: Replace these with a standard logger module
     def _warning(self, w: str) -> None:
@@ -54,23 +54,29 @@ class Harness:
     def _error(self, e: str) -> None:
         self.configuration_errors.append(e)
 
-    def proc_config_dir(self, dirname: str) -> None:
-        """ Recursively process all configuration files in dirname """
+    def proc_config_dir(self, dir_or_file_name: str, abs_config_dir:str = None) -> None:
+        """ Recursively process all configuration files in dir_or_file_name """
         def add_to_dictionary(source_dict: Dict, target_dict: Dict) -> None:
             for k, v in source_dict.items():
                 if k in target_dict and target_dict[k] != v:
-                    self._warning(f"{TypedNode.yaml_loc(k)} {type(v)} entry {k} was overwritten")
+                    self._warning(f"{TypedNode.yaml_loc(k)} {type(v).__name__} {k} entry was overwritten")
                 target_dict[k] = v
 
-        abs_config_dir = os.path.abspath(dirname)
-        for filename in os.listdir(abs_config_dir):
-            abs_filename = os.path.join(abs_config_dir, filename)
-            if os.path.isdir(abs_filename):
-                self.proc_config_dir(abs_filename)
-            elif '.' in filename:
+        abs_dir_or_file_name = os.path.abspath(dir_or_file_name)
+        is_dir_name = os.path.isdir(abs_dir_or_file_name)
+        if abs_config_dir is None:
+            abs_config_dir = abs_dir_or_file_name if is_dir_name else os.path.dirname(abs_dir_or_file_name)
+        if is_dir_name:
+            for filename in os.listdir(abs_dir_or_file_name):
+                abs_filename = os.path.join(abs_dir_or_file_name, filename)
+                self.proc_config_dir(abs_filename, abs_config_dir)
+        else:
+            filename = os.path.basename(abs_dir_or_file_name)
+            abs_filename = abs_dir_or_file_name
+            if '.' in filename:
                 suffix = filename.rsplit('.', 1)[1]
                 if suffix in KNOWN_LOADERS:
-                    rel_filename = os.path.relpath(abs_filename, dirname)
+                    rel_filename = os.path.relpath(abs_filename, abs_config_dir)
                     self.configuration_files.append(rel_filename)
                     manifest = KNOWN_LOADERS[suffix].load(abs_filename, Manifest, base_dir=abs_config_dir)
                     add_to_dictionary(manifest.subsets, self.subsets)
@@ -86,15 +92,18 @@ class Harness:
         package, module = ep.split(':') if ':' in ep else ep.rsplit('.', 1) if '.' in ep else (None, ep)
         try:
             m = import_module(package) if package else globals()
-        except ModuleNotFoundError:
-            self._error(f"Unrecognized entry point: {ep}")
+        except ModuleNotFoundError as e:
+            self._error(f"Unable to load: {ep}: {e.msg}")
             return None
         if hasattr(m, module):
             return getattr(m, module)
         self._error(f"Unrecognized method: {module} in entry_point: {ep}")
 
-    def validate_model(self) -> None:
-        """ Validate the model components """
+    def _validate_model(self) -> None:
+        """
+        Validate the model components.  Note that warnings still return success
+        :return: success indicator
+        """
         # If there are no modules, we've clearly missed the boat
         if not self.configuration_files:
             self._error("No valid configuration files were found.  Wrong directory path?")
@@ -136,3 +145,24 @@ class Harness:
                     self._error(f"TestEntry {testid}: Unrecognized filter: {testentry.filter}")
             elif test_module:
                 testentry.filter = test_module.filter
+
+    def has_errors(self) -> bool:
+        return bool(self.configuration_errors)
+
+    def has_warnings(self) -> bool:
+        return bool(self.configuration_warnings)
+
+    def details(self) -> str:
+        rval = []
+        if self.configuration_errors:
+            rval.append("Errors:")
+            for e in self.configuration_errors:
+                rval.append("\t" + e)
+            rval.append("")
+        if self.configuration_warnings:
+            rval.append("Warnings:")
+            for w in self.configuration_warnings:
+                rval.append("\t" + w)
+            rval.append("")
+        return "\n".join(rval)
+

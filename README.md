@@ -1,7 +1,7 @@
 # linkml-integration package
 Integration test for various linkml modules.
 
-This module carries the majority of the test cases for the various linkml modules.  It allow one to do a unit test
+This module carries the majority of the test cases for the various LinkML modules.  It allows one to do a unit test
 against any branch of [linkml](https://github.com/hsolbrig/linkml), [linkml-runtime](https://github.com/hsolbrig/linkml-runtime)
 and [linkml-model](https://github.com/hsolbrig/linkml-model)
 
@@ -33,4 +33,14 @@ Edit the following files;
 * submodules/linkml/pyproject.toml
 
 Changing the "0.0.0" version identifier to whatever is in pypi + 1.dev.  If, for instance, linkml-runtime is version 1.4.2,
-edit the version to be "1.4.3.dev"
+edit the version to be "1.4.3.dev".  Note: this issue should be corrected in the base modules at some point.
+
+## Generating the Model
+```bash
+cd model
+gen-python --no-slots integration.yaml > python/integration.py
+```
+
+## Testing the test harness (meta-test)
+
+

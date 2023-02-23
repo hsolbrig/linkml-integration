@@ -4,12 +4,13 @@ version = "0.1.0"
 description = "Integration and testing module for LinkML"
 authors = ["hsolbrig <informatics@solbrigs.us>"]
 readme = "README.md"
-packages = [{include = "testing_source"}]
+packages = [{include = "harness"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 linkml-runtime = { path = "submodules/linkml-runtime", develop = true}
 linkml = { path = "submodules/linkml", develop = true}
+coverage = "^7.1.0"
 
 
 [build-system]

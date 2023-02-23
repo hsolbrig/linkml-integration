@@ -30,4 +30,10 @@ tests:
         path: t1
       source:
         path: s1
+      subsets:
+        subset_y
+      comparator:
+        string_comparatory
+      filter:
+        identity_filterz
 

@@ -1,0 +1,31 @@
+description:  Config file for basic help test logic
+
+subsets:
+  help_tests: Test of CLI help output
+  generator_tests: test of generator functions
+
+comparators:
+  string_comparator:
+    entry_point: harness.support.basic_comparators:string_comparator
+    description: Simple string comparison
+
+filters:
+  identity_filter:
+    entry_point: harness.support.filters:identity_filter
+    description: Filter w/ no changes
+
+modules:
+  csv_generator:
+    entry_point: linkml.generators.csvgen:cli
+    entry_type: Generator
+    subsets: generator_tests
+
+tests:
+  csv_generator:
+    tests:
+      - name: help
+        target:
+          path: help.txt
+        use_stdout: True
+        parameters: --help
+        subsets: help_tests

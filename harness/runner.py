@@ -1,17 +1,23 @@
+import os
+import shlex
+from contextlib import redirect_stderr, redirect_stdout
 from dataclasses import dataclass
-from typing import List
+from io import StringIO
+from typing import List, Tuple, cast, Callable, Any
 
-from harness.harness import Harness, empty_list, TEST_ID
-from harness.support.dirutils import make_actual_directory, make_expected_directory
-from model.python.integration import ModuleName, SubsetName, TestEntry
+from harness.harness import Harness, empty_list
+from harness.run_log import RunLog
+from harness.support.dirutils import make_guarded_directory
+from model.python.integration import ModuleName, SubsetName, TestEntry, Filepath, Module, ModuleCallers
 
 
 @dataclass
 class HarnessRunner:
     """ Module to execute the set of tests in a harness """
     harness: Harness
-    actual_output_root_dir: str
+    source_root_dir: str
     expected_output_root_dir: str
+    actual_output_root_dir: str
 
     stop_on_error: bool = False
     run_one_test: bool = False
@@ -23,6 +29,8 @@ class HarnessRunner:
     only_tests: List[str] = empty_list()
     exclude_tests: List[str] = empty_list()
 
+    run_log: RunLog = None
+
     errors: List[str] = empty_list()
     warnings: List[str] = empty_list()
     progress: List[str] = empty_list()
@@ -32,9 +40,13 @@ class HarnessRunner:
         self.exclude_modules = [m if isinstance(m, ModuleName) else ModuleName(m) for m in self.exclude_modules]
         self.only_subsets = [s if isinstance(s, SubsetName) else ModuleName(s) for s in self.only_subsets]
         self.exclude_subsets = [s if isinstance(s, SubsetName) else ModuleName(s) for s in self.exclude_subsets]
+        self.run_log = RunLog(self.expected_output_root_dir)
 
     def _error(self, msg: str) -> None:
         self.errors.append(msg)
+
+    def _warning(self, msg: str) -> None:
+        self.warnings.append(msg)
 
     def _log(self, msg: str) -> None:
         if self.print_progress:
@@ -65,34 +77,164 @@ class HarnessRunner:
         _check_valid_testname(self.only_tests)
         _check_valid_testname(self.exclude_tests)
 
-        return bool(self.errors)
+        if not os.path.exists(self.actual_output_root_dir):
+            self._error(f"Output root directory ({self.actual_output_root_dir}) does not exist exist")
+        if not os.path.exists(self.expected_output_root_dir):
+            self._error(f"Expected output root directory ({self.expected_output_root_dir}) does not exist")
+
+        return not bool(self.errors)
 
     def run(self) -> bool:
         if not self.validate_parameters():
             return False
 
-        make_actual_directory(self.actual_output_root_dir, clear=True)
-        make_expected_directory(self.expected_output_root_dir, is_directory=True)
-
         for k, test_entry in self.harness.tests.items():
             module = self.harness.modules[k[0]]
             test_name = k[1]
-            test_description = f"Module {module.name}, test: {test_name}"
+            test_description = f"Module: {module.name}, test: {test_name}"
             if module.skip or \
                 test_entry.skip or \
                 (self.only_modules and module.name not in self.only_modules) or\
                 module.name in self.exclude_modules or \
-                (self.only_subsets and not (test_entry.subsets and self.only_subsets)) or \
-                (self.exclude_subsets and (test_entry.subsets and self.exclude_subsets)):
+                    (self.only_subsets and not (test_entry.subsets and self.only_subsets)) or \
+                    (self.exclude_subsets and (test_entry.subsets and self.exclude_subsets)):
                 self._log(f"{test_description} skipped")
                 break
-            if not self.run_test(test_entry) and self.stop_on_error or self.run_one_test:
+            if not self.run_test(test_description, test_entry, module) and self.stop_on_error or self.run_one_test:
                 break
 
-
-    def run_test(self, test_description: str, test_entry: TestEntry) -> bool:
+    def run_test(self, test_description: str, test_entry: TestEntry, module: Module) -> bool:
+        """
+        Run a single TestEntry test
+        :param test_description: Textual name of the test
+        :param test_entry: Test description
+        :param module: Test module
+        :return: True if success, False if error
+        """
         self._log(f"Running {test_description}")
-        return True
+        if (not test_entry.source or not test_entry.source.is_directory) and not test_entry.target.is_directory:
+            return self.proc_single_file(test_entry, module)
+        return False
+
+    def proc_single_file(self, test_entry: TestEntry, module: Module) -> bool:
+        source_path = os.path.join(self.source_root_dir, test_entry.source.path) if test_entry.source else None
+        expected_path, actual_path = self.target_path(module, test_entry.target)
+        param_str = (test_entry.parameters or "").format(outfile=actual_path)
+        parms = ([source_path] if source_path else []) + shlex.split(param_str)
+        self.run_log.start_test(module, test_entry)
+        stdout = StringIO()
+        stderr = StringIO()
+        with redirect_stderr(stderr):
+            with redirect_stdout(stdout):
+                # TODO: simplify this once permissible values get identity
+                method = cast(Callable, module.method)
+                match str(module.entry_type):
+                    case ModuleCallers.Generator.text:
+                        method(parms, standalone_mode=False, prog_name=module.name)
+                    case _:
+                        self._error(f"Unknown module entry_type: {module.entry_type}")
+                        return False
+        return self.evaluate_output(module,
+                                    test_entry,
+                                    stdout.getvalue(),
+                                    stderr.getvalue(),
+                                    expected_path,
+                                    actual_path)
+
+    def evaluate_output(self,
+                        module: Module,
+                        test: TestEntry,
+                        stdout: str,
+                        stderr: str,
+                        expected_fname: str,
+                        actual_fname: str) -> bool:
+        """ Evaluate the output and act accordingly """
+        if not test.use_stdout:
+            with open(actual_fname) as ef:
+                actual_text = ef.read()
+        else:
+            actual_text = stdout
+
+        # TODO: Think about how to get this into the declaration
+        comparator = cast(Callable[[Any, Any], str], self.harness.comparators[module.comparator].method)
+        filtr = cast(Callable[[any], Any], self.harness.filters[module.filter].method)
+
+        if stderr:
+            return self.run_log.unexpected_stderr_output(module, test, stderr)
+
+        elif os.path.exists(expected_fname):
+            with open(expected_fname) as ef:
+                expected_text = ef.read()
+            compare_result = comparator(filtr(expected_text), filtr(actual_text))
+            if compare_result:
+                return self.run_log.output_mismatch(compare_result)
+            else:
+                return self.run_log.success()
+
+        else:
+            os.makedirs(os.path.dirname(expected_fname), exist_ok=True)
+            with open(expected_fname, 'w') as exnew:
+                exnew.write(actual_text)
+            return self.run_log.new_output_file()
+
+    # def _validate_options(self,
+    #                       modules: Optional[List[ModuleName]],
+    #                       subsets: Optional[List[SubsetName]],
+    #                       tests: Optional[List[Tuple[ModuleName, str]]]) -> bool:
+    #     """
+    #     Validate input options and print errors on sys.stderr
+    #     :param modules: list of modules to test
+    #     :param subsets: list of subsets to test
+    #     :param tests: list of specific tests to run
+    #     :return: True if errors exist
+    #     """
+    #     error_list = []
+    #     # Validate the inputs
+    #     if modules:
+    #         for m in modules:
+    #             if m not in self.modules:
+    #                 error_list.append(f"Unrecognized module: {m}")
+    #         for s in subsets:
+    #             if s not in self.subsets:
+    #                 error_list.append(f"Unrecognized subset: {s}")
+    #         for t in tests:
+    #             if t[0] and t[0] not in self.modules:
+    #                 error_list.append(f"Unrecognized module for test: {t[0]}.{t[1]}")
+    #             elif t[0]:
+    #                 if t[1] not in self.tests[t[0]]:
+    #                     pass
+    def target_path(self, module: Module, target: Filepath) -> Tuple[str, str]:
+        """ Return two paths - one to the expected output, the second to the actual """
+        expected = os.path.join(self.expected_output_root_dir, module.name, target.path)
+        actual = os.path.join(self.actual_output_root_dir, module.name, target.path)
+        if target.is_directory:
+            make_guarded_directory(self.actual_output_root_dir,
+                                   [module.name, target.path],
+                                   clear=True)
+        else:
+            make_guarded_directory(self.actual_output_root_dir,
+                                   [module.name, os.path.dirname(target.path)],
+                                   clear=False)
+        return expected, actual
+
+        #                     source_path = self.source_path(test.source)
+        #                     expected_path, actual_path = self.target_path(test.target)
+        #                     param_str = (test.parameters or "").format(outfile=actual_path)
+        #                     parms = ([source_path] if source_path else []) + shlex.split(param_str)
+        #
+        #                     stdout = StringIO()
+        #                     stderr = StringIO()
+        #                     with redirect_stderr(stderr):
+        #                         with redirect_stdout(stdout):
+        #                             try:
+        #                                 ep(parms, prog_name=module_name)
+        #                             except click_tweaker.CLIExitException:
+        #                                 pass
+        #
+        #                     self.evaluate_output(test, stdout.getvalue(), stderr.getvalue(), expected_path, actual_path)
+        #                 else:
+        #                     self.run_log.log_skipped_test(module_name, test)
+
 
     #
     # def set_testing_module(self, module_name: str) -> bool:
@@ -126,64 +268,9 @@ class HarnessRunner:
     # def source_path(self, source: Optional[Filepath]) -> str:
     #     return os.path.join(INPUT_BASE, source.path) if source else None
     #
-    # def target_path(self, target: Filepath) -> Tuple[str, str]:
-    #     """ Return two paths - one to the expected output, the second to the actual """
-    #     expected = os.path.join(OUTPUT_BASE, self.module_info.name, target.path)
-    #     actual = os.path.join(TEMP_BASE, self.module_info.name, target.path)
-    #     if target.is_directory:
-    #         make_actual_directory(actual, clear=True)
-    #     else:
-    #         make_expected_directory(actual, is_directory=False)
-    #     return expected, actual
+
     #
-    # def evaluate_output(self, test: TestEntry, stdout: str, stderr: str, expected_fname: str, actual_fname: str) -> None:
-    #     """ Evaluate the output and act accordingly """
-    #     if not test.use_stdout:
-    #         with open(actual_fname) as ef:
-    #             actual_text = ef.read()
-    #     else:
-    #         actual_text = stdout
-    #
-    #     if os.path.exists(expected_fname):
-    #         with open(expected_fname) as af:
-    #             expected_text = af.read()
-    #         compare_result = self.module_comparator(self.module_filter(expected_text), self.module_filter(actual_text))
-    #         if compare_result:
-    #             self.run_log.log_file_mismatch(self.module_info, test, expected_fname, compare_result)
-    #         else:
-    #             self.run_log.log_success(self.module_info, test)
-    #     else:
-    #         make_expected_directory(expected_fname, is_directory=test.target.is_directory)
-    #         with open(expected_fname, 'w') as exnew:
-    #             exnew.write(actual_text)
-    #         self.run_log.log_new_test(self.module_info, test, expected_fname)
-    #
-    # def _validate_options(self,
-    #                       modules: Optional[List[ModuleName]],
-    #                       subsets: Optional[List[SubsetName]],
-    #                       tests: Optional[List[Tuple[ModuleName, str]]]) -> bool:
-    #     """
-    #     Validate input options and print errors on sys.stderr
-    #     :param modules: list of modules to test
-    #     :param subsets: list of subsets to test
-    #     :param tests: list of specific tests to run
-    #     :return: True if errors exist
-    #     """
-    #     error_list = []
-    #     # Validate the inputs
-    #     if modules:
-    #         for m in modules:
-    #             if m not in self.modules:
-    #                 error_list.append(f"Unrecognized module: {m}")
-    #         for s in subsets:
-    #             if s not in self.subsets:
-    #                 error_list.append(f"Unrecognized subset: {s}")
-    #         for t in tests:
-    #             if t[0] and t[0] not in self.modules:
-    #                 error_list.append(f"Unrecognized module for test: {t[0]}.{t[1]}")
-    #             elif t[0]:
-    #                 if t[1] not in self.tests[t[0]]:
-    #                     pass
+
     #
     #
     #

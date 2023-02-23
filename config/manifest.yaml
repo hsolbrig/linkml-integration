@@ -1,6 +1,13 @@
 tests:
   owlgen:
     tests:
+      - name: help
+        target:
+          path: help.txt
+        use_stdout: True
+        parameters: --help
+        subsets: help_tests
+
       - target:
           path: linkml_source/meta.owl
         source:
@@ -9,6 +16,12 @@ tests:
 
   jsonldcontextgen:
     tests:
+      - name: help
+        target:
+          path: help.txt
+        use_stdout: True
+        parameters: --help
+        subsets: help_tests
       - target:
           path: linkml_source/types.context.jsonld
         source:
@@ -42,11 +55,19 @@ tests:
 
   jsongen:
     tests:
+      - name: help
+        target:
+          path: help.txt
+        use_stdout: True
+        parameters: --help
+        subsets: help_tests
+
       - target:
           path: linkml_source/types.json
         source:
           path: linkml_source/types.yaml
         use_stdout: True
+
       - target:
           path: linkml_source/mappings.json
         source:
@@ -75,6 +96,13 @@ tests:
 
   prefixmapgen:
     tests:
+      - name: help
+        target:
+          path: help.txt
+        use_stdout: True
+        parameters: --help
+        subsets: help_tests
+
       - target:
           path: prefixtest.context.jsonld
         source:
@@ -88,6 +116,13 @@ tests:
 
   markdowngen:
     tests:
+      - name: help
+        target:
+          path: help.txt
+        use_stdout: True
+        parameters: --help
+        subsets: help_tests
+
       - target:
           path: linkml_source/markdowndoc
           is_directory: true
